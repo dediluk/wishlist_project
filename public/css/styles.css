@@ -1,0 +1,49 @@
+.card {
+    transition: transform .2s; /* Animation */
+    width: 200px;
+    height: 200px;
+    margin: 0 auto;
+    word-wrap: break-word;
+}
+
+.card:hover {
+    transform: scale(1.1); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
+    z-index: 2;
+}
+
+.index_wishes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 36px 1%;
+}
+
+.index_users {
+    display: flex;
+    flex-direction: column;
+}
+
+.card-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-wrap: break-word;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+}
+
+a {
+    text-decoration: none;
+}
+
+.content_block {
+    margin-top: 20px;
+}
+
+.user_detail, .header-link {
+    width: fit-content;
+    color: #1a202c;
+}
+
+.user_detail:hover, .header-link:hover {
+    color: #718096;
+}
