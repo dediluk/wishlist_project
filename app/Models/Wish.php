@@ -10,6 +10,12 @@ class Wish extends Model
 {
     use HasFactory, SoftDeletes;
 
+    protected $fillable = [
+        'title',
+        'description',
+        'creator'
+    ];
+
     public function categories()
     {
         return $this->belongsToMany(Category::class, 'category_wish');

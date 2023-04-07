@@ -12,6 +12,7 @@
             crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
     <title>Document</title>
+    <link rel="icon" type="image/x-icon" href="{{asset('images/wishlist_icon.ico')}}">
 </head>
 <body>
 <div class="container">

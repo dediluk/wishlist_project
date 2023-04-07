@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewWishAddedEvent;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Wish;
@@ -24,7 +25,7 @@ class WishController extends Controller
      */
     public function create()
     {
-        //
+        return view('wishes.create');
     }
 
     /**
@@ -32,7 +33,16 @@ class WishController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'title' => ['required', 'min:2'],
+            'description' => ['required', 'min:2']
+        ]);
+
+
+        $data['creator'] = auth()->user()->id;
+
+        $newWish = Wish::create($data);
+        return redirect(route('wishes.show', ['wish' => $newWish->id]));
     }
 
     /**
@@ -41,7 +51,6 @@ class WishController extends Controller
     public function show(int $id)
     {
         $wish = Wish::with('usersWhoWish', 'creatorUser')->where('id', $id)->first();
-//        $wish->load('categories', 'creatorUser');
         return view('wishes.show', compact('wish'));
     }
 
@@ -66,6 +75,7 @@ class WishController extends Controller
      */
     public function destroy(Wish $wish)
     {
-        //
+        $wish->delete();
+        return redirect(route('wishes.index'));
     }
 }

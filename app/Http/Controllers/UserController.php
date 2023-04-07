@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewWishAddedEvent;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -10,6 +11,12 @@ use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
+
+    public function __construct()
+    {
+//        $this->middleware('auth');
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -89,9 +96,14 @@ class UserController extends Controller
             ->where('reserved_by', $id)
             ->join('users', 'user_wish.user_id', '=', 'users.id')
             ->join('wishes', 'user_wish.wish_id', '=', 'wishes.id')
-            ->select('user_wish.user_id', 'user_wish.wish_id', 'users.name', 'wishes.title')
+            ->select('user_wish.user_id', 'user_wish.wish_id as id', 'users.name', 'wishes.title', 'wishes.description')
             ->get();
-        return view('users.show', compact('user', 'reservedWishes'));
+        $reservationsForUsers = [];
+        foreach ($reservedWishes as $item) {
+            $reservationsForUsers[$item->name][] = [$item->id, $item->title, $item->user_id];
+        }
+
+        return view('users.show', compact('user', 'reservationsForUsers'));
     }
 
     /**
@@ -116,5 +128,27 @@ class UserController extends Controller
     public function destroy(string $id)
     {
         //
+    }
+
+    public function subscribe(int $subscribed_user_id)
+    {
+        $current_user = auth()->user();
+        if ($current_user && $current_user->id != $subscribed_user_id && !$current_user->subscriptions->contains($subscribed_user_id) &&  User::where('id', $subscribed_user_id)->exists()) {
+            $current_user->subscriptions()->attach($subscribed_user_id);
+            return back();
+        } else {
+            abort(404);
+        }
+    }
+
+    public function unsubscribe(int $subscribed_user_id)
+    {
+        $current_user = auth()->user();
+        if ($current_user && $current_user->subscriptions->contains($subscribed_user_id)) {
+            $current_user->subscriptions()->detach($subscribed_user_id);
+            return back();
+        } else {
+            abort(404);
+        }
     }
 }

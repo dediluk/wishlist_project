@@ -8,10 +8,12 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use App\Events\NewWishAddedEvent;
+use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable
 {
-    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -53,5 +55,13 @@ class User extends Authenticatable
 
     public function wishedWish() {
         return $this->belongsToMany(Wish::class,'user_wish', 'user_id', 'wish_id');
+    }
+
+    public function subscribers() {
+        return $this->belongsToMany(User::class, 'user_subscription', 'user_subscribed_id', 'user_subscriber_id');
+    }
+
+    public function subscriptions() {
+        return $this->belongsToMany(User::class, 'user_subscription', 'user_subscriber_id', 'user_subscribed_id');
     }
 }
