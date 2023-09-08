@@ -1,4 +1,7 @@
 <x-layout>
+    <x-slot:title>
+        New wish
+        </x-slot>
     <form action="{{route('wishes.store')}}" method="POST">
         @csrf
         <label for="title">

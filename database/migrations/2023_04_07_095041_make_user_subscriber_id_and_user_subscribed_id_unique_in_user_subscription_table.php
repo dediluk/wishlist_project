@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('user_subscription', function (Blueprint $table) {
-            $table->unique(['user_subscriber_id', 'user_subscribed_id']);
+//            $table->unique(['user_subscriber_id', 'user_subscribed_id']);
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('user_subscription', function (Blueprint $table) {
-            $table->dropUnique('user_subscriber_id_user_subscribed_id_unique');
+//            $table->dropUnique('user_subscriber_id_user_subscribed_id_unique');
         });
     }
 };

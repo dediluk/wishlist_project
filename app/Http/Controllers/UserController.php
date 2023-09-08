@@ -4,26 +4,28 @@ namespace App\Http\Controllers;
 
 use App\Events\NewWishAddedEvent;
 use App\Models\User;
+use App\Services\UserService;
+use App\Services\UserWishService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Validation\Rule;
+use Stripe\Stripe;
+use Stripe\StripeClient;
 
 class UserController extends Controller
 {
 
-    public function __construct()
+    public function __construct(private UserService $userService)
     {
-//        $this->middleware('auth');
     }
 
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::all();
-        return view('users.index', compact('users'));
+        return view('users.index', ['users' => $this->userService->index()]);
     }
 
     /**
@@ -39,18 +41,7 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        $data = $request->validate([
-                'name' => ['required', 'min:3'],
-                'email' => ['required', 'email', Rule::unique('users', 'email')],
-                'password' => ['required', 'confirmed', 'min:6']
-            ]
-        );
-
-        $data['password'] = password_hash($data['password'], PASSWORD_DEFAULT);
-        $newUser = User::create($data);
-
-        auth()->login($newUser);
-
+        $this->userService->store($request);
         return redirect(route('wishes.index'));
     }
 
@@ -61,10 +52,7 @@ class UserController extends Controller
 
     public function logout(Request $request)
     {
-        auth()->logout();
-
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
+        $this->userService->logout($request);
         return redirect(route(
             'index'
         ));
@@ -72,38 +60,16 @@ class UserController extends Controller
 
     public function authenticate(Request $request)
     {
-        $data = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required', 'min:6'],
-        ]);
-
-        if (auth()->attempt($data)) {
-            $request->session()->regenerate();
-
-            return redirect(route('index'));
-        }
-
-        return back()->withErrors(['email' => 'Invalid credentials'])->onlyInput('email');
+        return $this->userService->authenticate($request) ? redirect(route('index'))
+            : back()->withErrors(['email' => 'Invalid credentials'])->onlyInput('email');
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(int $id)
+    public function show(Request $request, int $id)
     {
-        $user = User::with('wishedWish')->find($id);
-        $reservedWishes = DB::table('user_wish')
-            ->where('reserved_by', $id)
-            ->join('users', 'user_wish.user_id', '=', 'users.id')
-            ->join('wishes', 'user_wish.wish_id', '=', 'wishes.id')
-            ->select('user_wish.user_id', 'user_wish.wish_id as id', 'users.name', 'wishes.title', 'wishes.description')
-            ->get();
-        $reservationsForUsers = [];
-        foreach ($reservedWishes as $item) {
-            $reservationsForUsers[$item->name][] = [$item->id, $item->title, $item->user_id];
-        }
-
-        return view('users.show', compact('user', 'reservationsForUsers'));
+        return view('users.show', $this->userService->show($id));
     }
 
     /**
@@ -132,23 +98,17 @@ class UserController extends Controller
 
     public function subscribe(int $subscribed_user_id)
     {
-        $current_user = auth()->user();
-        if ($current_user && $current_user->id != $subscribed_user_id && !$current_user->subscriptions->contains($subscribed_user_id) &&  User::where('id', $subscribed_user_id)->exists()) {
-            $current_user->subscriptions()->attach($subscribed_user_id);
-            return back();
-        } else {
-            abort(404);
-        }
+        return $this->userService->subscribe($subscribed_user_id) ? back() : abort(404);
     }
 
     public function unsubscribe(int $subscribed_user_id)
     {
-        $current_user = auth()->user();
-        if ($current_user && $current_user->subscriptions->contains($subscribed_user_id)) {
-            $current_user->subscriptions()->detach($subscribed_user_id);
-            return back();
-        } else {
-            abort(404);
-        }
+        return $this->userService->unsubscribe($subscribed_user_id) ? back() : abort(404);
+    }
+
+    public function changeRole(int $id, Request $request)
+    {
+        $this->userService->changeRole($id, $request);
+        return back();
     }
 }

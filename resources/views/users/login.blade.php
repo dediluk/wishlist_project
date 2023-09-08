@@ -1,4 +1,7 @@
 <x-layout>
+    <x-slot:title>
+        Login
+        </x-slot>
 <form action="{{route('users.authenticate')}}" method="POST">
     @csrf
     <div class="email">

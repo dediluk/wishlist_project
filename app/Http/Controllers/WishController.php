@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\Wish;
 use http\Client\Response;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class WishController extends Controller
 {
@@ -50,7 +51,7 @@ class WishController extends Controller
      */
     public function show(int $id)
     {
-        $wish = Wish::with('usersWhoWish', 'creatorUser')->where('id', $id)->first();
+        $wish = Wish::with('usersWhoWish', 'creatorUser')->where('id', $id)->withTrashed()->first();
         return view('wishes.show', compact('wish'));
     }
 
@@ -75,7 +76,14 @@ class WishController extends Controller
      */
     public function destroy(Wish $wish)
     {
-        $wish->delete();
-        return redirect(route('wishes.index'));
+        if (isset(auth()->user()->roles) && (auth()->user()->hasRole(['admin', 'moderator']) || auth()->user()->id == $wish->creatorUser->id)) {
+            $wish->delete();
+            DB::table('user_wish')
+                ->where('wish_id', $wish->id)
+                ->delete();
+                return redirect(route('wishes.index'));
+        }
+        abort(403);
+
     }
 }

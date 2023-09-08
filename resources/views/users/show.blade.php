@@ -1,7 +1,10 @@
 <x-layout>
+{{--    @section('title', $user->name)--}}
+    <x-slot:title>
+        {{ $user->name }}
+        </x-slot>
     <div class="user_header">
         <h1 class="user_name">{{ $user->name }}</h1>
-        {{--        {{var_dump(auth()->user()->subscriptions->contains($user->id))}}--}}
         @if(auth()->user() && auth()->user()->id != $user->id)
             @if(!auth()->user()->subscriptions->contains($user->id))
                 <a href="{{route('users.subscribe', ['subscribed_user_id'=> $user->id])}}" class="subscribe_button">
@@ -11,6 +14,17 @@
                 <a href="{{route('users.unsubscribe', ['subscribed_user_id'=> $user->id])}}" class="subscribe_button">
                     <button type="button" class="btn btn-danger">Unsubscribe</button>
                 </a>
+            @endif
+            @if(auth()->user()->hasRole('admin'))
+                <form action="{{route('users.change_role', ['id' => $user->id])}}" method="POST">
+                    @csrf
+                    <select name="users_role" class="form-select form-select-sm" aria-label=".form-select-sm example"
+                            onchange="this.form.submit()">
+                        <option value="admin" @if($user->hasRole('admin')) selected @endif>Admin</option>
+                        <option value="moderator" @if($user->hasRole('moderator')) selected @endif>Moderator</option>
+                        <option value="user" @if($user->hasRole('user')) selected @endif>User</option>
+                    </select>
+                </form>
             @endif
         @endif
 
@@ -53,14 +67,29 @@
 
         <div class="user_wished_div">
             <h3>{{$user->name}}'s wishes:</h3>
-            @foreach($user->wishedWish as $wish)
-                <a href="{{route('wishes.show', ['wish' => $wish->id])}}"
-                   class="wish_details">{{$wish->title}} </a>
+            @foreach($userWishes as $wish)
+                <a href="{{route('wishes.show', ['wish' => $wish->wishId])}}"
+                   class="wish_details">{{$wish->wish_title}} </a>
                 <br>
                 @if($user->id != auth()->id() && auth()->id())
-                    <a href="{{route('user_wish.reservation', ['wish_id' => $wish->id, 'user_id' => $user->id])}}">reserve</a>
-                    -
-                    <a href="{{route('user_wish.wished', ['wish_id' => $wish->id])}}">I wish</a>
+
+                    @if(auth()->id() == $wish->reservedById)
+{{--                        <a href="#">unreserve</a>--}}
+                        <a class="red_text_class" href="{{route('user_wish.unreservation', ['wishId' => $wish->wishId, 'userId' => $user->id])}}">unreserve</a>
+                    @else
+                        <a href="{{route('user_wish.reservation', ['wish_id' => $wish->wishId, 'user_id' => $user->id])}}"
+                           @if ($wish->reservedByUsername)
+                               class="inactive_link"
+                            @endif><span class="green_text_class">reserve</span></a>
+                        @if(auth()->user()->hasRole('admin') && $wish->reservedById)
+                            (by
+                            <a href="{{route('users.show', ['user' => $wish->reservedById])}}"
+                               class="user_detail">
+                                {{$wish->reservedByUsername}}
+                            </a>
+                            )
+                        @endif
+                    @endif
                 @endif
 
                 <br>

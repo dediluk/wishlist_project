@@ -15,6 +15,6 @@ class IsModerator
      */
     public function handle(Request $request, Closure $next): Response
     {
-        return $next($request);
+        return isset($request->user()->roles) && $request->user()->hasRole('moderator') ? $next($request) : abort(403);
     }
 }

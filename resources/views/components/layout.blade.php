@@ -11,7 +11,9 @@
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
-    <title>Document</title>
+    <script src="{{asset('js/dynamicCardsColor.js')}}"></script>
+{{--    <title>@yield('title')</title>--}}
+    <title>{{ $title ?? 'Todo Manager' }}</title>
     <link rel="icon" type="image/x-icon" href="{{asset('images/wishlist_icon.ico')}}">
 </head>
 <body>
@@ -39,19 +41,25 @@
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                             <li><a class="dropdown-item" href="{{route('users.index')}}">All users</a></li>
-                            <li><a class="dropdown-item" href="{{route('users.create')}}">Create user</a></li>
+                            @if(!auth()->user())
+                                <li><a class="dropdown-item" href="{{route('users.create')}}">Create user</a></li>
+                            @endif
+
                         </ul>
                     </li>
                 </ul>
                 @if (auth()->user())
-                    <a href="{{route('users.show', ['user' => auth()->user()->id])}}" class="user_detail"> {{auth()->user()->name}}</a>
+                    <a class="nav-link header-link" href="{{route('subscriptions.index')}}"> My subscriptions </a>
+                    <a class="user_detail" href="{{route('users.show', ['user' => auth()->user()->id])}}"> {{auth()->user()->name}}</a>
                     <a class="nav-link header-link" href="{{route('users.logout')}}" tabindex="-1">Logout</a>
                 @else
                     <a class="nav-link header-link" href="{{route('users.login')}}" tabindex="-1">Login</a>
                     <a class="nav-link header-link" href="{{route('users.create')}}" tabindex="-1">Registration</a>
                 @endif
-                <form class="d-flex">
-                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
+                <form class="d-flex" action="{{route('search')}}" method="POST">
+                    @csrf
+                    <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search"
+                           name="searchTerm" value="{{old('searchTerm')}}">
                     <button class="btn btn-outline-success" type="submit">Search</button>
                 </form>
             </div>

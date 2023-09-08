@@ -2,9 +2,13 @@
 
 namespace App\Providers;
 
+use App\Events\NewSubscriberEvent;
 use App\Events\NewWishAddedEvent;
+use App\Listeners\NotifyNewSubscriber;
 use App\Listeners\NotifyWishlistSubscribers;
+use App\Models\Wish;
 use App\Notifications\UsersNewWishNotification;
+use App\Observers\WishObserver;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
@@ -23,6 +27,9 @@ class EventServiceProvider extends ServiceProvider
         ],
         NewWishAddedEvent::class => [
             NotifyWishlistSubscribers::class
+        ],
+        NewSubscriberEvent::class => [
+            NotifyNewSubscriber::class
         ]
     ];
 
@@ -31,7 +38,7 @@ class EventServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Wish::observe(WishObserver::class);
     }
 
     /**

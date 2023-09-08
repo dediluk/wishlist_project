@@ -30,4 +30,14 @@ class Wish extends Model
     {
         return $this->belongsToMany(User::class, 'user_wish', 'wish_id', 'user_id');
     }
+
+//    public function reservedBy()
+//    {
+//        return $this->belongsTo(User::class, 'reserved_by', 'id');
+//    }
+//    public function reservedBy()
+//    {
+//        return $this->belongsTo(User::class, 'user_wish', 'wish_id', 'user_id')
+//            ->where('reserved_by', '!=', null);
+//    }
 }

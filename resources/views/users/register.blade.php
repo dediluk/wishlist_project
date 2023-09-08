@@ -1,4 +1,7 @@
 <x-layout>
+    <x-slot:title>
+        Registration
+        </x-slot>
 <form method="POST" action="{{route('users.store')}}">
     @csrf
     <div class="name">

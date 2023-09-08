@@ -1,4 +1,7 @@
 <x-layout>
+    <x-slot:title>
+        Wishes
+        </x-slot>
     <div class="create_wish_div">
         <a href="{{route('wishes.create')}}" class="">
             <button type="button" class="btn btn-success">Create wish</button>
