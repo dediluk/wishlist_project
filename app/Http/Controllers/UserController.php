@@ -2,16 +2,20 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\MyEvent;
 use App\Events\NewWishAddedEvent;
 use App\Models\User;
+use App\Models\Wish;
 use App\Services\UserService;
 use App\Services\UserWishService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 use Illuminate\Validation\Rule;
 use Stripe\Stripe;
 use Stripe\StripeClient;
+use Pusher\Pusher;
 
 class UserController extends Controller
 {
@@ -25,6 +29,25 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
+        \auth()->loginUsingId(7);
+//        event(new MyEvent('test from event'));
+//        $options = array(
+//            'cluster' => 'eu',
+//            'useTLS' => true
+//        );
+//
+////        dd($_ENV);
+//
+//
+//        $pusher = new Pusher(
+//            env('PUSHER_APP_KEY'),
+//            env('PUSHER_APP_SECRET'),
+//            env('PUSHER_APP_ID'),
+//            $options
+//        );
+//
+//        $pusher->trigger('my-channel', 'my-event', ['message' => 'testFromLara']);
+//        dd('test');
         return view('users.index', ['users' => $this->userService->index()]);
     }
 
@@ -69,6 +92,9 @@ class UserController extends Controller
      */
     public function show(Request $request, int $id)
     {
+//        $wish = Wish::query()->where('id',60)->first();
+//        dd($wish);
+//        $this->authorize('canUnreserveWish', [User::class, $wish]);
         return view('users.show', $this->userService->show($id));
     }
 

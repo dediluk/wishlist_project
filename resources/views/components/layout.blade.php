@@ -12,9 +12,21 @@
             crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
     <script src="{{asset('js/dynamicCardsColor.js')}}"></script>
-{{--    <title>@yield('title')</title>--}}
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{--    <title>@yield('title')</title>--}}
     <title>{{ $title ?? 'Todo Manager' }}</title>
     <link rel="icon" type="image/x-icon" href="{{asset('images/wishlist_icon.ico')}}">
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    @if (auth()->id())
+        <script type="module">
+            window.Echo.private('App.Models.User.{{ Auth::id() }}').listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (e) => {
+                toastr.success(e.user + ' subscribed to you!')
+                console.log()
+            })
+        </script>
+    @endif
 </head>
 <body>
 <div class="container">
@@ -50,7 +62,8 @@
                 </ul>
                 @if (auth()->user())
                     <a class="nav-link header-link" href="{{route('subscriptions.index')}}"> My subscriptions </a>
-                    <a class="user_detail" href="{{route('users.show', ['user' => auth()->user()->id])}}"> {{auth()->user()->name}}</a>
+                    <a class="user_detail"
+                       href="{{route('users.show', ['user' => auth()->user()->id])}}"> {{auth()->user()->name}}</a>
                     <a class="nav-link header-link" href="{{route('users.logout')}}" tabindex="-1">Logout</a>
                 @else
                     <a class="nav-link header-link" href="{{route('users.login')}}" tabindex="-1">Login</a>

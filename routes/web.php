@@ -1,5 +1,6 @@
 <?php
 
+use App\Events\MyEvent;
 use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 

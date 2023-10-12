@@ -3,15 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Events\NewWishAddedEvent;
+use App\Jobs\DeletedWish;
 use App\Models\Category;
 use App\Models\User;
 use App\Models\Wish;
 use http\Client\Response;
+use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class WishController extends Controller
 {
+
+    use HandlesAuthorization;
+
     /**
      * Display a listing of the resource.
      */
@@ -26,6 +33,7 @@ class WishController extends Controller
      */
     public function create()
     {
+        $this->authorize('create', Wish::class);
         return view('wishes.create');
     }
 
@@ -51,7 +59,7 @@ class WishController extends Controller
      */
     public function show(int $id)
     {
-        $wish = Wish::with('usersWhoWish', 'creatorUser')->where('id', $id)->withTrashed()->first();
+        $wish = Wish::with('usersWhoWish', 'creatorUser', 'reservedBy')->where('id', $id)->withTrashed()->first();
         return view('wishes.show', compact('wish'));
     }
 
@@ -81,9 +89,10 @@ class WishController extends Controller
             DB::table('user_wish')
                 ->where('wish_id', $wish->id)
                 ->delete();
-                return redirect(route('wishes.index'));
+//            dispatch(new DeletedWish(auth()->user(), $wish))->delay(now()->addSecond(10));
+            Artisan::call('app:test-command');
+            return redirect(route('wishes.index'));
         }
         abort(403);
-
     }
 }

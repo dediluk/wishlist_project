@@ -31,7 +31,7 @@ class UsersNewSubscriberNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail'];
+        return ['mail', 'broadcast'];
     }
 
     /**
@@ -54,7 +54,13 @@ class UsersNewSubscriberNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            //
+            'subscriber_user' => $this->subscriberUser->name,
+            'subscribed_user' => $this->subscribedUser->name
         ];
+    }
+
+    public function toDatabase(object $notifiable): array
+    {
+        return $this->toArray($notifiable);
     }
 }

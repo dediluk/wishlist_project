@@ -22,11 +22,7 @@ main {
     gap: 36px 1%;
 }
 
-.inactive_link {
-    pointer-events: none;
-    cursor: default;
-    color: #718096;
-}
+
 
 .index_users {
     display: flex;
@@ -159,7 +155,11 @@ a:hover {
     display: flex;
 }
 
-
+.inactive_link {
+    pointer-events: none;
+    cursor: default;
+    color: #718096;
+}
 @media (prefers-color-scheme: dark) {
     body, .navbar {
         background-color: #434343;

@@ -45,7 +45,6 @@ class WishUpdateNotification extends Notification implements ShouldQueue
             ->subject("{$this->wish->title} was updated")
             ->greeting("Hello, Admin!")
             ->line("{$this->wish->title} (id: {$this->wish->id}) was updated by {$this->whoUpdate->name} ({$this->whoUpdate->email})");
-//            ->action("Subscribe to {$this->subscriberUser->name}", url(route('users.subscribe', ['subscribed_user_id'=>$this->subscriberUser->id])));
     }
 
     /**

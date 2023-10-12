@@ -14,7 +14,7 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        \App\Models\User::factory(10)->create()->each(function (User $user) {
+        \App\Models\User::factory(60)->create()->each(function (User $user) {
             $user->assignRole('user');
         });
     }

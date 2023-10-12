@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -15,6 +16,13 @@ class Wish extends Model
         'description',
         'creator'
     ];
+
+    protected function title(): Attribute
+    {
+        return Attribute::make(
+            get: fn (string $value, array $attributes) => $value . $attributes['description'],
+        );
+    }
 
     public function categories()
     {
@@ -31,10 +39,10 @@ class Wish extends Model
         return $this->belongsToMany(User::class, 'user_wish', 'wish_id', 'user_id');
     }
 
-//    public function reservedBy()
-//    {
-//        return $this->belongsTo(User::class, 'reserved_by', 'id');
-//    }
+    public function reservedBy()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 //    public function reservedBy()
 //    {
 //        return $this->belongsTo(User::class, 'user_wish', 'wish_id', 'user_id')

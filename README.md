@@ -43,5 +43,6 @@ sudo docker exec -it wishlist_project-laravel-1 php artisan db:seed
 ```
 
 
-
-
+To run webSocket
+npm build && npm run dev
+php artisan queue:work
