@@ -13,15 +13,12 @@ class UsersNewSubscriberNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
-    private User $subscriberUser;
-    private User $subscribedUser;
     /**
      * Create a new notification instance.
      */
-    public function __construct(User $subscriberUser, User $subscribedUser)
+    public function __construct(private User $subscriberUser, private User $subscribedUser)
     {
-        $this->subscriberUser = $subscriberUser;
-        $this->subscribedUser = $subscribedUser;
+        //
     }
 
     /**
@@ -31,7 +28,7 @@ class UsersNewSubscriberNotification extends Notification implements ShouldQueue
      */
     public function via(object $notifiable): array
     {
-        return ['mail', 'broadcast'];
+        return ['database', 'mail', 'broadcast'];
     }
 
     /**
@@ -54,8 +51,9 @@ class UsersNewSubscriberNotification extends Notification implements ShouldQueue
     public function toArray(object $notifiable): array
     {
         return [
-            'subscriber_user' => $this->subscriberUser->name,
-            'subscribed_user' => $this->subscribedUser->name
+            'subscriber_user_id' => $this->subscriberUser->id,
+            'subscriber_user_name' => $this->subscriberUser->name,
+            'subscribed_user' => $this->subscribedUser->id,
         ];
     }
 

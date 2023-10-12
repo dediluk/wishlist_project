@@ -1,7 +1,5 @@
 <?php
 
-use App\Events\MyEvent;
-use App\Http\Middleware\Authenticate;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -20,7 +18,7 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/users/{user_id}/reservation/{wish_id}', [\App\Http\Controllers\UserWishController::class, 'reserved'])
         ->name('user_wish.reservation')
-        ->missing(function(Request $request) {
+        ->missing(function(\Illuminate\Http\Client\Request $request) {
             dd('test');
         });
     Route::get('/users/{userId}/unreservation/{wishId}', [\App\Http\Controllers\UserWishController::class, 'unreservation'])

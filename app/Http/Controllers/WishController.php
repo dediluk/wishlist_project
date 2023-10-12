@@ -2,17 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Events\NewWishAddedEvent;
 use App\Jobs\DeletedWish;
-use App\Models\Category;
-use App\Models\User;
 use App\Models\Wish;
-use http\Client\Response;
 use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Gate;
 
 class WishController extends Controller
 {
@@ -89,8 +83,7 @@ class WishController extends Controller
             DB::table('user_wish')
                 ->where('wish_id', $wish->id)
                 ->delete();
-//            dispatch(new DeletedWish(auth()->user(), $wish))->delay(now()->addSecond(10));
-            Artisan::call('app:test-command');
+            dispatch(new DeletedWish(auth()->user(), $wish))->delay(now()->addSecond(10));
             return redirect(route('wishes.index'));
         }
         abort(403);

@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -19,7 +20,7 @@ class WishFactory extends Factory
         return [
             'title' => fake()->words(3, true),
             'description' => fake()->sentence(),
-            'creator' => random_int(1, 10),
+            'creator' => User::factory(),
         ];
     }
 }

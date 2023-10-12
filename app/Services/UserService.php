@@ -2,14 +2,10 @@
 
 namespace App\Services;
 
-use App\Events\MyEvent;
 use App\Events\NewSubscriberEvent;
 use App\Models\User;
-use App\Models\Wish;
-use App\Notifications\UsersNewSubscriberNotification;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\Rule;
 use Spatie\Permission\Models\Role;
@@ -17,7 +13,7 @@ use Spatie\Permission\Models\Role;
 class UserService
 {
 
-    public function __construct(private Request $request)
+    public function __construct()
     {
     }
 
@@ -115,8 +111,6 @@ class UserService
     public function changeRole(int $id, Request $request): void
     {
         $user = User::findOrFail($id);
-        dd($request->old('users_role'));
-//        $request->flash();
         $new_role = $request->post('users_role');
         $user->removeRole($user->roles[0]->name);
         $user->assignRole($new_role);
