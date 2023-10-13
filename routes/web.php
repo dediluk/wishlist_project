@@ -51,9 +51,7 @@ Route::fallback(function () {
     dd('fallback');
 });
 
-Route::get('/test', function () {
-   return 'response';
-});
+Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notification.index');
 
 //Route::resource('/users', \App\Http\Controllers\UserController::class);
 //Route::get('/logout', [\App\Http\Controllers\UserController::class, 'logout'])->name('users.logout');

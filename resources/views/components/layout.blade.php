@@ -11,19 +11,30 @@
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"></script>
     <link rel="stylesheet" href="{{ asset('css/styles.css') }}">
+
     <script src="{{asset('js/dynamicCardsColor.js')}}"></script>
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
-    {{--    <title>@yield('title')</title>--}}
+
     <title>{{ $title ?? 'Todo Manager' }}</title>
+
     <link rel="icon" type="image/x-icon" href="{{asset('images/wishlist_icon.ico')}}">
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+            integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+    <link href="https://fonts.cdnfonts.com/css/google-sans" rel="stylesheet">
+
     @if (auth()->id())
         <script type="module">
-            window.Echo.private('App.Models.User.{{ Auth::id() }}').listen('.Illuminate\\Notifications\\Events\\BroadcastNotificationCreated', (e) => {
-                toastr.success(e.user + ' subscribed to you!')
-                console.log()
+            toastr.options.progressBar = true;
+            window.Echo.private('App.Models.User.{{ Auth::id() }}').listen('.subscriber-notification', (e) => {
+                e.subscription_type === 'subscribe' ? toastr.success(e.subscriber_user_name + ' subscribed to you!') :
+                    toastr.warning(e.subscriber_user_name + ' unsubscribed')
+                let notification_counter = document.getElementById('notification-counter-id'),
+                    newAmountOfUnreadNotifications = parseInt(notification_counter.textContent) + 1
+
+                notification_counter.textContent = newAmountOfUnreadNotifications
             })
         </script>
     @endif
@@ -46,21 +57,17 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{route('users.index')}}">Users</a>
                     </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                           data-bs-toggle="dropdown" aria-expanded="false">
-                            Users
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item" href="{{route('users.index')}}">All users</a></li>
-                            @if(!auth()->user())
-                                <li><a class="dropdown-item" href="{{route('users.create')}}">Create user</a></li>
-                            @endif
-
-                        </ul>
-                    </li>
                 </ul>
                 @if (auth()->user())
+                    <a class="nav-link header-link" href="{{route('notification.index')}}">
+                        <div class="notifications"
+                             id="notification-center">
+                            <div class="notification-counter">
+                                <span
+                                        id="notification-counter-id">{{auth()->user()->unreadNotifications->count()}}</span>
+                            </div>
+                            <img src="{{asset('images/notifications.png')}}" alt=""></div>
+                    </a>
                     <a class="nav-link header-link" href="{{route('subscriptions.index')}}"> My subscriptions </a>
                     <a class="user_detail"
                        href="{{route('users.show', ['user' => auth()->user()->id])}}"> {{auth()->user()->name}}</a>

@@ -9,14 +9,14 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 
-class UsersNewSubscriberNotification extends Notification implements ShouldQueue
+class UserSubscriberNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     /**
      * Create a new notification instance.
      */
-    public function __construct(private User $subscriberUser, private User $subscribedUser)
+    public function __construct(private User $subscriberUser, private User $subscribedUser, private string $subscriptionType)
     {
         //
     }
@@ -54,11 +54,17 @@ class UsersNewSubscriberNotification extends Notification implements ShouldQueue
             'subscriber_user_id' => $this->subscriberUser->id,
             'subscriber_user_name' => $this->subscriberUser->name,
             'subscribed_user' => $this->subscribedUser->id,
+            'subscription_type' => $this->subscriptionType
         ];
     }
 
     public function toDatabase(object $notifiable): array
     {
         return $this->toArray($notifiable);
+    }
+
+    public function broadcastAs()
+    {
+        return 'subscriber-notification';
     }
 }

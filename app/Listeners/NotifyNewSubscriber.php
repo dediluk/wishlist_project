@@ -3,10 +3,10 @@
 namespace App\Listeners;
 
 use App\Events\NewSubscriberEvent;
-use App\Notifications\UsersNewSubscriberNotification;
+use App\Notifications\UpdateAmountOfSubscribersNotification;
+use App\Notifications\UserSubscriberNotification;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Notification;
 
 class NotifyNewSubscriber implements ShouldQueue
@@ -28,6 +28,8 @@ class NotifyNewSubscriber implements ShouldQueue
     {
         $subscriberUser = $event->subscriberUser;
         $subscribedUser = $event->subscribedUser;
-        Notification::send($subscribedUser, new UsersNewSubscriberNotification($subscriberUser, $subscribedUser));
+        $subscriptionType = $event->subscriptionType;
+        Notification::send($subscribedUser,
+                            new UserSubscriberNotification($subscriberUser, $subscribedUser, $subscriptionType));
     }
 }

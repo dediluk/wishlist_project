@@ -61,7 +61,6 @@ class UserService
 
     public function show(int $id): array
     {
-//        Auth::loginUsingId(1);
         $user = User::with('wishedWish')->find($id);
         $reservedWishes = DB::table('user_wish')
             ->where('reserved_by', $id)
@@ -81,7 +80,7 @@ class UserService
             ->select('user_wish.user_id as user_id', 'user_wish.reserved_by as reservedById','user_wish.wish_id as wishId',
                 'users.name as reservedByUsername', 'wishes.title as wish_title')
             ->get();
-//        dd($userWishes);
+
         return ['user' => $user, 'reservationsForUsers' => $reservationsForUsers, 'userWishes' => $userWishes];
     }
 
@@ -91,7 +90,7 @@ class UserService
         if ($this->checkAbilityOfSubscription($currentUser, $subscribedUserId)) {
             $currentUser->subscriptions()->attach($subscribedUserId);
             $subscribedUser = User::find($subscribedUserId);
-            event(new NewSubscriberEvent($currentUser, $subscribedUser));
+            event(new NewSubscriberEvent($currentUser, $subscribedUser, 'subscribe'));
             return true;
         }
         return false;
@@ -102,6 +101,8 @@ class UserService
         $currentUser = auth()->user();
         if ($this->checkAbilityOfUnsubscription($currentUser, $subscribedUserId)) {
             $currentUser->subscriptions()->detach($subscribedUserId);
+            $unsubsribedUser = User::find($subscribedUserId);
+            event(new NewSubscriberEvent($currentUser, $unsubsribedUser, 'unsubscribe'));
             return true;
         }
 
